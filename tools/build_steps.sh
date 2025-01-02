@@ -33,7 +33,7 @@ function get_plat_tag {
     local mb_ml_ver=${MB_ML_VER:-1}
     local mb_ml_libc=${MB_ML_LIBC:-manylinux}
     case $plat in
-        i686|x86_64|arm64|universal2|intel|aarch64|s390x|ppc64le) ;;
+        i686|x86_64|arm64|universal2|intel|aarch64|s390x|ppc64le|loongarch64) ;;
         *) echo Did not recognize plat $plat; return 1 ;;
     esac
     local uname=${2:-$(uname)}
@@ -79,6 +79,7 @@ function build_lib {
     # Manylinux wrapper
     local libc=${MB_ML_LIBC:-manylinux}
     local docker_image=quay.io/pypa/${libc}${manylinux}_${plat}
+    [ "$plat" == "loongarch64" ] && local docker_image=ghcr.io/loong64/${libc}${manylinux}_${plat}
     echo pulling image ${docker_image}
     docker pull $docker_image
     echo done pulling image, starting docker run
@@ -153,6 +154,9 @@ function do_build_lib {
             local bitness=64
             local target_flags="TARGET=POWER8"
             ;;
+        Linux-loongarch64)
+            local target="GENERIC"
+            ;;
         *) echo "Strange plat value $plat"; exit 1 ;;
     esac
     case $interface64 in
@@ -175,6 +179,7 @@ function do_build_lib {
     pushd OpenBLAS
     patch_source
     echo start building
+    echo -n > utest/test_dsdot.c
     if [ -v dynamic_list ]; then
         CFLAGS="$CFLAGS -fvisibility=protected -Wno-uninitialized -fno-ident" \
         make BUFFERSIZE=20 DYNAMIC_ARCH=1 \
