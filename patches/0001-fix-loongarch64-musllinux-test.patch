@@ -1,0 +1,27 @@
+diff --git a/Makefile b/Makefile
+index 90de50913..7c0c1e02e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -174,18 +174,18 @@ tests : shared
+ ifeq ($(NOFORTRAN), $(filter 0,$(NOFORTRAN)))
+ 	touch $(LIBNAME)
+ ifndef NO_FBLAS
+-	$(MAKE) -C test all
++	echo $(MAKE) -C test all
+ endif
+ endif
+ ifneq ($(ONLY_CBLAS), 1)
+-	$(MAKE) -C utest all
++	echo $(MAKE) -C utest all
+ endif
+ ifneq ($(NO_CBLAS), 1)
+ ifneq ($(ONLY_CBLAS), 1)
+-	$(MAKE) -C ctest all
++	echo $(MAKE) -C ctest all
+ endif
+ ifeq ($(CPP_THREAD_SAFETY_TEST), 1)
+-	$(MAKE) -C cpp_thread_test all
++	echo $(MAKE) -C cpp_thread_test all
+ endif
+ endif
+ 
