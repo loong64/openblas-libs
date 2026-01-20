@@ -55,7 +55,6 @@ def get_wheel_names(package, version):
     print(f"looking in {index_url}")
     index_html = http.request("GET", index_url)
     soup = BeautifulSoup(index_html.data, "html.parser")
-    breakpoint()
     return [xxx['href'] for xxx in soup.find_all('a', href=True) if version in str(xxx)]
 
 
