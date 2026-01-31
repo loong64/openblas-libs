@@ -30,10 +30,10 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v6.0.1
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6.2.0
       with:
         python-version: 3.12
         architecture: arm64
@@ -74,7 +74,7 @@ jobs:
         python -m scipy_openblas${env:INTERFACE_BITS}
         python -c "import scipy_openblas${env:INTERFACE_BITS}; print(scipy_openblas${env:INTERFACE_BITS}.get_pkg_config())"
 
-    - uses: actions/upload-artifact@v4.3.0
+    - uses: actions/upload-artifact@v6.0.0
       with:
         name: wheels-${{ env.PLAT }}-${{ env.INTERFACE64 }}
         path: dist/scipy_openblas*.whl
