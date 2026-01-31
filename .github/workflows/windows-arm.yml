@@ -85,6 +85,8 @@ jobs:
         Invoke-WebRequest https://static.rust-lang.org/rustup/dist/aarch64-pc-windows-msvc/rustup-init.exe -UseBasicParsing -Outfile rustup-init.exe
         .\rustup-init.exe -y
         $env:PATH="$env:PATH;$env:USERPROFILE\.cargo\bin"
+        # cryptography dropped win-arm64 for 46.0.4, make sure we don't try to compile from source
+        pip install --only-binary :all: cryptography
         pip install anaconda-client
 
     - name: Upload
