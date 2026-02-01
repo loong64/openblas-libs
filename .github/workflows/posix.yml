@@ -47,6 +47,9 @@ jobs:
           - { os: ubuntu-24.04-arm, PLAT: s390x, INTERFACE64: '0', MB_ML_VER: '2014', MB_ML_LIBC: manylinux}
           - { os: ubuntu-24.04-arm, PLAT: s390x, INTERFACE64: '1', MB_ML_VER: '2014', MB_ML_LIBC: manylinux}
 
+          - { os: ubuntu-24.04-arm, PLAT: riscv64, INTERFACE64: '0', MB_ML_VER: '_2_39', MB_ML_LIBC: manylinux}
+          - { os: ubuntu-24.04-arm, PLAT: riscv64, INTERFACE64: '1', MB_ML_VER: '_2_39', MB_ML_LIBC: manylinux}
+
     env:
       NIGHTLY: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       MB_ML_LIBC: ${{ matrix.MB_ML_LIBC }}
@@ -57,7 +60,7 @@ jobs:
       OS-NAME: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v6.0.1
       with:
         submodules: recursive
         fetch-depth: 0
@@ -73,8 +76,8 @@ jobs:
         xcode-version: '15.4'
 
     - name: Set up QEMU
-      if: matrix.PLAT == 'ppc64le' || matrix.PLAT == 's390x'
-      uses: docker/setup-qemu-action@v3
+      if: matrix.PLAT == 'ppc64le' || matrix.PLAT == 's390x' || matrix.PLAT == 'riscv64'
+      uses: docker/setup-qemu-action@v3.7.0
       with:
         platforms: all
 
@@ -89,7 +92,7 @@ jobs:
     #     limit-access-to-actor: true
 
     - name: Build and Test wheels
-      uses: pypa/cibuildwheel@v3.3.0
+      uses: pypa/cibuildwheel@v3.3.1
       timeout-minutes: 60
       with:
         output-dir: dist
@@ -107,15 +110,16 @@ jobs:
         CIBW_MUSLLINUX_PPC64LE_IMAGE: ${{ matrix.MB_ML_LIBC }}${{matrix.MB_ML_VER}}
         CIBW_MANYLINUX_S390X_IMAGE: ${{ matrix.MB_ML_LIBC }}${{matrix.MB_ML_VER}}
         CIBW_MUSLLINUX_S390X_IMAGE: ${{ matrix.MB_ML_LIBC }}${{matrix.MB_ML_VER}}
+        CIBW_MANYLINUX_RISCV64_IMAGE: ${{ matrix.MB_ML_LIBC }}${{matrix.MB_ML_VER}}
 
     - name: Upload wheels to artifacts
-      uses: actions/upload-artifact@v4.3.0
+      uses: actions/upload-artifact@v6.0.0
       with:
         name: wheels-${{ matrix.os }}-${{ matrix.PLAT }}-${{ matrix.INTERFACE64 }}-${{ matrix.MB_ML_LIBC }}-${{ matrix.MB_ML_VER }}
         path: dist/scipy_openblas*.whl
 
 
-    - uses: conda-incubator/setup-miniconda@v3.2.0
+    - uses: conda-incubator/setup-miniconda@v3.3.0
       with:
         channels: conda-forge
         channel-priority: true

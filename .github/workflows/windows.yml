@@ -31,7 +31,7 @@ jobs:
 
     timeout-minutes: 90
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v6.0.1
     - name: install-rtools
       run: |
         # rtools 42+ does not support 32 bits builds.
@@ -85,7 +85,7 @@ jobs:
         cp for_test\test*.exe builds
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6.2.0
       with:
         python-version: 3.9
         architecture: ${{ matrix.plat }}
@@ -141,12 +141,12 @@ jobs:
         fi
 
     - name: Set up different Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6.2.0
       with:
         python-version: 3.11
         architecture: ${{ matrix.plat }}
 
-    - uses: actions/upload-artifact@v4.3.0
+    - uses: actions/upload-artifact@v6.0.0
       with:
         name: wheels-${{matrix.plat }}-${{ matrix.INTERFACE64 }}
         path: dist/scipy_openblas*.whl
