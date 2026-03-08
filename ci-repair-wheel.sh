@@ -33,10 +33,19 @@ with zipfile.ZipFile(whl, 'a') as z:
     python3 -c "
 import sys, zipfile, pathlib, glob
 whl = next(pathlib.Path(sys.argv[1]).glob('*.whl'))
-with zipfile.ZipFile(whl, 'a') as z:
-    for f in glob.glob('*/lib/libgfortran*'):
-        z.write(f)
-    " "$1"
+patched = {f: pathlib.Path(f).read_bytes() for f in glob.glob('*/lib/libgfortran*')}
+
+# Read all original entries, replacing patched one
+entries = {}
+with zipfile.ZipFile(whl, 'r') as z:
+    for item in z.infolist():
+        entries[item] = patched.get(item.filename, z.read(item.filename))
+
+# Rewrite the archive
+with zipfile.ZipFile(whl, 'w', compression=zipfile.ZIP_DEFLATED) as z:
+    for item, data in entries.items():
+        z.writestr(item, data)    
+" "$1"
     mkdir -p /output
     # copy libs/openblas*.tar.gz to dist/
     cp libs/openblas*.tar.gz /output/
